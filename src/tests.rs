@@ -11,6 +11,7 @@ use crate::{
 };
 use pretty_assertions::{assert_eq, Comparison};
 use serde_json::json;
+use crate::encoding::RenderOptions;
 
 fn parse_tokens(text: impl AsRef<str>) -> Vec<Rank> {
     text.as_ref()
@@ -525,7 +526,10 @@ fn test_render_and_render_conversation_roundtrip() {
     let encoding = load_harmony_encoding(HarmonyEncodingName::HarmonyGptOss).unwrap();
     let msg = Message::from_role_and_content(Role::User, "Hello");
     let convo = Conversation::from_messages([msg.clone()]);
-    let tokens_msg = encoding.render(&msg).unwrap();
+    let render_options = RenderOptions {
+        conversation_has_function_tools: false,
+    };
+    let tokens_msg = encoding.render(&msg, &render_options).unwrap();
     let tokens_convo = encoding.render_conversation(&convo, None).unwrap();
     assert_eq!(tokens_msg, tokens_convo);
     let tokens_completion = encoding
